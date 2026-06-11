@@ -2,20 +2,20 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"polybench/jobs"
 	"runtime"
-	"time"
-	"os"
-	"strings"
 	"strconv"
+	"strings"
+	"time"
 )
+
 type Bench struct {
 	Success       bool    `json:"success"`
 	TimeElapsedMs float64 `json:"timeElapsedMs"`
 	MemDeltaKb    int64   `json:"memDeltaKb"`
 	Error         *string `json:"error"`
 }
-
 
 func rssKB() int64 {
 	data, _ := os.ReadFile("/proc/self/status")
@@ -50,21 +50,22 @@ func measure(fn func() (map[string]any, error)) (map[string]any, Bench) {
 	return out, Bench{
 		Success:       err == nil,
 		TimeElapsedMs: elapsed,
-		MemDeltaKb:    int64(after) - int64(before),
+		MemDeltaKb:    after - before,
 		Error:         errStr,
 	}
 }
 
-func wrap(out map[string]any, b Bench) map[string]any {
-	for k, v := range map[string]any{
+func wrap(b Bench) map[string]any {
+	return map[string]any{
 		"success":       b.Success,
 		"timeElapsedMs": b.TimeElapsedMs,
 		"memDeltaKb":    b.MemDeltaKb,
 		"error":         b.Error,
-	} {
-		out[k] = v
 	}
-	return out
+}
+
+func attach(out map[string]any, b Bench) map[string]any {
+	return wrap(b)
 }
 
 func main() {
@@ -72,12 +73,16 @@ func main() {
 	jsonOut, jsonMeta := measure(jobs.JSONParse)
 	matrixOut, matrixMeta := measure(jobs.MatrixMul)
 
+	_ = primeOut
+	_ = jsonOut
+	_ = matrixOut
+
 	result := map[string]any{
 		"language": "go",
 		"benchmarks": map[string]any{
-			"prime_sieve": wrap(primeOut, primeMeta),
-			"json_parse":  wrap(jsonOut, jsonMeta),
-			"matrix_mul":  wrap(matrixOut, matrixMeta),
+			"prime_sieve": attach(primeOut, primeMeta),
+			"json_parse":  attach(jsonOut, jsonMeta),
+			"matrix_mul":  attach(matrixOut, matrixMeta),
 		},
 	}
 
