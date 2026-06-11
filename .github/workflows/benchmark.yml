@@ -41,40 +41,40 @@ jobs:
             artifact: benchmark-rust
 
           - language: go
-            install: "cd benchmarks/go && go build -o polybench"
+            install: "cd benchmarks/go && go mod download && go build -o polybench"
             run_dir: benchmarks/go
             run_cmd: ./polybench
             setup: go
-            version: ""
+            version: "1.26.4"
             artifact: benchmark-go
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: python setup
+      - name: Python setup
         if: matrix.setup == 'python'
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.version }}
 
-      - name: node setup
+      - name: Node setup
         if: matrix.setup == 'node'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.version }}
 
-      - name: rust setup
+      - name: Rust setup
         if: matrix.setup == 'rust'
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           components: rustfmt, clippy
 
-      - name: go setup
+      - name: Go setup
         if: matrix.setup == 'go'
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          go-version: ${{ matrix.version }}
           cache: true
 
       - name: install
@@ -85,6 +85,7 @@ jobs:
         run: |
           cd ${{ matrix.run_dir }}
           ${{ matrix.run_cmd }} > result.json
+          cat result.json
 
       - name: build result
         run: |
