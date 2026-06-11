@@ -15,18 +15,29 @@ jobs:
         include:
           - language: python
             install: pip install psutil
+            setup: actions/setup-python@v5
+            version_key: python-version
+            version: "3.11"
             run_dir: benchmarks/python
             run_cmd: python3 main.py
             artifact: benchmark-python
 
+          - language: javascript
+            install: ""
+            setup: actions/setup-node@v4
+            version_key: node-version
+            version: "20"
+            run_dir: benchmarks/javascript
+            run_cmd: node main.js
+            artifact: benchmark-javascript
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: python setup
-        if: matrix.language == 'python'
-        uses: actions/setup-python@v5
+      - name: ${{ matrix.language }} setup
+        uses: ${{ matrix.setup }}
         with:
-          python-version: "3.11"
+          ${{ matrix.version_key }}: ${{ matrix.version }}
 
       - name: install
         if: matrix.install != ''
