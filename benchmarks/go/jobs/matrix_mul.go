@@ -31,6 +31,8 @@ func MatrixMul() (map[string]any, error) {
 	}
 
 	return map[string]any{
+		"success": true,
+		"error": nil,
 		"checksum": c[0][0],
 	}, nil
 }

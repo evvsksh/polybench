@@ -21,6 +21,8 @@ func PrimeSieve() (map[string]any, error) {
 	}
 
 	return map[string]any{
+		"success": true,
+		"error": nil,
 		"result": count,
 	}, nil
 }

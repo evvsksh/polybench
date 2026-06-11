@@ -37,6 +37,8 @@ func JSONParse() (map[string]any, error) {
 	_ = sum
 
 	return map[string]any{
+		"success": true,
+		"error": nil,
 		"result": sum,
 	}, nil
 }
