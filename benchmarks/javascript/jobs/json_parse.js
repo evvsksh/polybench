@@ -1,4 +1,6 @@
 function json_parse() {
+  const start = performance.now();
+
   const data = [];
 
   for (let i = 0; i < 500000; i++) {
@@ -17,7 +19,13 @@ function json_parse() {
     sum += parsed[i].arr.length;
   }
 
-  return sum;
+  const end = performance.now();
+
+  return {
+    success: true,
+    timeElapsedMs: end - start,
+    memDeltaKb: 0,
+  };
 }
 
 module.exports = { json_parse };

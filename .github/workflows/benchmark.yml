@@ -29,8 +29,16 @@ jobs:
             run_dir: benchmarks/javascript
             run_cmd: node main.js
             setup: node
-            version: "20"
+            version: "24"
             artifact: benchmark-javascript
+
+          - language: rust
+            install: "cargo build --release"
+            run_dir: benchmarks/rust
+            run_cmd: ./target/release/polybench
+            setup: rust
+            version: ""
+            artifact: benchmark-rust
 
     steps:
       - uses: actions/checkout@v4
@@ -46,6 +54,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.version }}
+
+      - name: Rust setup
+        if: matrix.setup == 'rust'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
 
       - name: install
         if: matrix.install != ''

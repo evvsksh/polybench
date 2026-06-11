@@ -1,15 +1,13 @@
-function matrix_mul() {
-  const n = 512;
+function matrix_mul(n = 128) {
+  const A = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, () => i * 0.01),
+  );
 
-  const A = new Array(n)
-    .fill(0)
-    .map((_, i) => new Array(n).fill(0).map(() => i * 0.01));
+  const B = Array.from({ length: n }, (_, j) =>
+    Array.from({ length: n }, () => j * 0.02),
+  );
 
-  const B = new Array(n)
-    .fill(0)
-    .map((_, i) => new Array(n).fill(0).map((_, j) => j * 0.02));
-
-  const C = new Array(n).fill(0).map(() => new Array(n).fill(0));
+  const C = Array.from({ length: n }, () => Array(n).fill(0.0));
 
   for (let i = 0; i < n; i++) {
     for (let k = 0; k < n; k++) {
