@@ -119,14 +119,30 @@ jobs:
         with:
           node-version: 24
 
+      - name: install deps
+        run: npm install sharp
+
       - name: generate svg
         run: |
           cd canvas
           node generate.js --json "$(cat ../results/results.json)"
 
-      - name: create assets tag
+      - name: convert svg to png
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -f assets
-          git push origin assets --force
+          node -e "
+          const sharp = require('sharp');
+          sharp('canvas/leaderboard.svg')
+            .png({ quality: 100 })
+            .toFile('canvas/leaderboard.png')
+            .then(() => console.log('PNG generated'));
+          "
+
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: assets
+          name: assets
+          prerelease: true
+          files: canvas/leaderboard.png
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
