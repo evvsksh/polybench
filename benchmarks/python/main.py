@@ -10,6 +10,8 @@ def run_bench(fn):
     p = psutil.Process()
 
     mem_before = p.memory_info().rss
+
+    p.cpu_percent(None)
     t0 = time.perf_counter()
 
     error = None
@@ -24,12 +26,15 @@ def run_bench(fn):
         tb = traceback.format_exc()
 
     t1 = time.perf_counter()
+
+    cpu = p.cpu_percent(None)
     mem_after = p.memory_info().rss
 
     result = {
         "success": success,
         "timeElapsedMs": (t1 - t0) * 1000,
         "memDeltaKb": (mem_after - mem_before) / 1024,
+        "cpuPercent": cpu,
     }
 
     if error is not None:
