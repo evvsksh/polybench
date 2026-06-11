@@ -155,6 +155,7 @@ jobs:
       - name: generate svg
         run: |
           cd canvas
+          cat ../results/results.json
           node generate.js --json "$(cat ../results/results.json)"
 
       - name: convert svg to png
