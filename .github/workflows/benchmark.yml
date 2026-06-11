@@ -59,10 +59,37 @@ jobs:
           jq -n --slurpfile data ${{ matrix.run_dir }}/result.json \
             --arg lang "${{ matrix.language }}" \
             '{language:$lang, benchmarks:$data[0].benchmarks}' > results/result.json
-          cat results/result.json
 
       - name: upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: results/result.json
+
+  aggregate:
+    needs: benchmark
+    runs-on: ubuntu-latest
+    name: Aggregate results
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: merge artifacts
+        run: |
+          jq -s '
+            map({
+              language: .language,
+              benchmarks: .benchmarks
+            })
+          ' artifacts/*/results.json > results.json
+
+      - name: show final json
+        run: cat results.json
+
+      - name: upload merged result
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-global
+          path: results.json
