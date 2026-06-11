@@ -1,4 +1,4 @@
-def prime_sieve(n=5000000):
+def prime_sieve(n=20000000):
     sieve = bytearray(b"\x01") * (n + 1)
     sieve[0:2] = b"\x00\x00"
 

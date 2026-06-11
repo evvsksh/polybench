@@ -2,8 +2,9 @@ import json
 
 
 def json_parse():
-    data = [{"id": i, "v": i * 2} for i in range(200_000)]
+    data = [{"id": i, "arr": list(range(20))} for i in range(500_000)]
+
     raw = json.dumps(data)
     parsed = json.loads(raw)
 
-    return sum(x["v"] for x in parsed)
+    return sum(len(x["arr"]) for x in parsed)
