@@ -6,11 +6,10 @@ const { matrix_mul } = require("./jobs/matrix_mul");
 
 function runBench(fn) {
   const startMem = process.memoryUsage().rss;
-
   const start = performance.now();
 
-  let error = null;
   let success = false;
+  let error = null;
 
   try {
     fn();
@@ -22,19 +21,12 @@ function runBench(fn) {
   const end = performance.now();
   const endMem = process.memoryUsage().rss;
 
-  const cpu = process.cpuUsage();
-
-  const result = {
+  return {
     success,
     timeElapsedMs: end - start,
     memDeltaKb: (endMem - startMem) / 1024,
-    cpuUserMs: cpu.user / 1000,
-    cpuSystemMs: cpu.system / 1000,
+    error,
   };
-
-  if (error) result.error = error;
-
-  return result;
 }
 
 function main() {
