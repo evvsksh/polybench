@@ -116,7 +116,7 @@ jobs:
           jq -s '
             map({
               language: .language,
-              benchmarks: .benchmarks
+              benchmarks: (.benchmarks // {})
             })
           ' artifacts/*/result.json > results.json
 
