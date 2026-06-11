@@ -7,6 +7,7 @@ jobs:
   benchmark:
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
+    name: Benchmark (${{ matrix.language }})
 
     strategy:
       fail-fast: false
@@ -39,9 +40,9 @@ jobs:
       - name: build result
         run: |
           mkdir -p results
-          jq -n --argfile data ${{ matrix.run_dir }}/result.json \
+          jq -n --slurpfile data ${{ matrix.run_dir }}/result.json \
             --arg lang "${{ matrix.language }}" \
-            '{language:$lang, benchmarks:$data.benchmarks}' > results/result.json
+            '{language:$lang, benchmarks:$data[0].benchmarks}' > results/result.json
 
       - name: upload
         uses: actions/upload-artifact@v4
