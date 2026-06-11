@@ -13,9 +13,6 @@ jobs:
       matrix:
         include:
           - language: python
-            setup: actions/setup-python@v5
-            version_key: python-version
-            version: "3.11"
             install: pip install psutil
             run_dir: benchmarks/python
             run_cmd: python3 main.py
@@ -24,28 +21,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: ${{ matrix.language }} setup
-        uses: ${{ matrix.setup }}
+      - name: python setup
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v5
         with:
-          ${{ matrix.version_key }}: ${{ matrix.version }}
+          python-version: "3.11"
 
-      - name: ${{ matrix.language }} install
+      - name: install
         if: matrix.install != ''
         run: ${{ matrix.install }}
 
-      - name: ${{ matrix.language }} benchmark
+      - name: run benchmark
         run: |
           cd ${{ matrix.run_dir }}
           ${{ matrix.run_cmd }} > result.json
 
-      - name: ${{ matrix.language }} build result
+      - name: build result
         run: |
           mkdir -p results
           jq -n --argfile data ${{ matrix.run_dir }}/result.json \
             --arg lang "${{ matrix.language }}" \
             '{language:$lang, benchmarks:$data.benchmarks}' > results/result.json
 
-      - name: ${{ matrix.language }} upload
+      - name: upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
