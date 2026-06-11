@@ -33,7 +33,7 @@ jobs:
             artifact: benchmark-javascript
 
           - language: rust
-            install: "cargo build --release"
+            install: "cd benchmarks/rust && cargo build --release"
             run_dir: benchmarks/rust
             run_cmd: ./target/release/polybench
             setup: rust
