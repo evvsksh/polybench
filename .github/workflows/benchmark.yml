@@ -40,6 +40,14 @@ jobs:
             version: ""
             artifact: benchmark-rust
 
+          - language: go
+            install: "cd benchmarks/go && go build -o polybench"
+            run_dir: benchmarks/go
+            run_cmd: ./polybench
+            setup: go
+            version: ""
+            artifact: benchmark-go
+
     steps:
       - uses: actions/checkout@v4
 
@@ -55,12 +63,19 @@ jobs:
         with:
           node-version: ${{ matrix.version }}
 
-      - name: Rust setup
+      - name: rust setup
         if: matrix.setup == 'rust'
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           components: rustfmt, clippy
+
+      - name: go setup
+        if: matrix.setup == 'go'
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
 
       - name: install
         if: matrix.install != ''
