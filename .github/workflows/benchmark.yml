@@ -1,0 +1,52 @@
+name: Benchmark
+
+on:
+  push:
+
+jobs:
+  benchmark:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: python
+            setup: actions/setup-python@v5
+            version_key: python-version
+            version: "3.11"
+            install: pip install psutil
+            run_dir: benchmarks/python
+            run_cmd: python3 main.py
+            artifact: benchmark-python
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ${{ matrix.language }} setup
+        uses: ${{ matrix.setup }}
+        with:
+          ${{ matrix.version_key }}: ${{ matrix.version }}
+
+      - name: ${{ matrix.language }} install
+        if: matrix.install != ''
+        run: ${{ matrix.install }}
+
+      - name: ${{ matrix.language }} benchmark
+        run: |
+          cd ${{ matrix.run_dir }}
+          ${{ matrix.run_cmd }} > result.json
+
+      - name: ${{ matrix.language }} build result
+        run: |
+          mkdir -p results
+          jq -n --argfile data ${{ matrix.run_dir }}/result.json \
+            --arg lang "${{ matrix.language }}" \
+            '{language:$lang, benchmarks:$data.benchmarks}' > results/result.json
+
+      - name: ${{ matrix.language }} upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: results/result.json
