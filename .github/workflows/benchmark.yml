@@ -76,14 +76,16 @@ jobs:
         with:
           path: artifacts
 
-      - name: merge artifacts
+      - name: merge results
         run: |
+          find artifacts -type f -name "result.json"
+
           jq -s '
             map({
               language: .language,
               benchmarks: .benchmarks
             })
-          ' artifacts/*/results.json > results.json
+          ' artifacts/*/result.json > results.json
 
       - name: show final json
         run: cat results.json
