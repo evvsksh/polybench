@@ -95,3 +95,41 @@ jobs:
         with:
           name: benchmark-global
           path: results.json
+
+  canvas:
+    needs: aggregate
+    runs-on: ubuntu-latest
+    name: Canvas
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: benchmark-global
+          path: results
+
+      - name: node setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: generate svg
+        run: |
+          cd canvas
+          node generate.js --json "$(cat ../results/results.json)"
+
+      - name: create assets tag
+        run: |
+          git tag -f assets
+          git push origin assets --force
+
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: assets
+          name: assets
+          prerelease: true
+          files: canvas/leaderboard.svg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
