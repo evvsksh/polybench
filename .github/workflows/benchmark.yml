@@ -1,5 +1,8 @@
 name: Benchmark
 
+permissions:
+  contents: write
+
 on:
   push:
 
@@ -101,6 +104,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Canvas
 
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -109,8 +115,7 @@ jobs:
           name: benchmark-global
           path: results
 
-      - name: node setup
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
 
@@ -121,15 +126,7 @@ jobs:
 
       - name: create assets tag
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -f assets
           git push origin assets --force
-
-      - name: create release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: assets
-          name: assets
-          prerelease: true
-          files: canvas/leaderboard.svg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
