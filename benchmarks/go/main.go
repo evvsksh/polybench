@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"polybench/jobs"
 	"runtime"
@@ -87,5 +88,5 @@ func main() {
 	}
 
 	b, _ := json.Marshal(result)
-	println(string(b))
+	fmt.Println(string(b))
 }
