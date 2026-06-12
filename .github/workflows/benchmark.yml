@@ -89,15 +89,12 @@ jobs:
 
       - name: build result
         run: |
-          mkdir -p results
-          jq -n --slurpfile data ${{ matrix.run_dir }}/result.json \
-            --arg lang "${{ matrix.language }}" \
-            '
-            {
-              language: $lang,
-              benchmarks: ($data[0].benchmarks // {})
-            }
-            ' > results/result.json
+          python3 -c "
+          import json, sys
+          data = json.load(open('${{ matrix.run_dir }}/result.json'))
+          out = {'language': '${{ matrix.language }}', 'benchmarks': data.get('benchmarks', {})}
+          json.dump(out, open('results/result.json', 'w'))
+          "
 
       - name: upload
         uses: actions/upload-artifact@v4
