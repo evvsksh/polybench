@@ -89,6 +89,7 @@ jobs:
 
       - name: build result
         run: |
+          mkdir -p results
           python3 -c "
           import json, sys
           data = json.load(open('${{ matrix.run_dir }}/result.json'))
